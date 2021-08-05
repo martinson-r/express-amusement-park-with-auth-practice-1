@@ -2,22 +2,31 @@
 const express = require('express');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
+const session = require('express-session');
 
-const { environment } = require('./config');
+const { environment, secret } = require('./config');
 const indexRoutes = require('./routes');
 const parkRoutes = require('./routes/park');
 const attractionRoutes = require('./routes/attraction');
+const userRoutes = require('./routes/user');
 
 const app = express();
+
 
 app.set('view engine', 'pug');
 
 app.use(morgan('dev'));
-app.use(cookieParser());
+app.use(cookieParser(secret));
 app.use(express.urlencoded({ extended: false }));
+app.use(session({
+  secret: secret,
+  resave: false,
+  saveUninitialized: false,
+}));
 app.use(indexRoutes);
 app.use(parkRoutes);
 app.use(attractionRoutes);
+app.use(userRoutes);
 
 // Catch unhandled requests and forward to error handler.
 app.use((req, res, next) => {
